@@ -131,7 +131,6 @@ def process_sheet(sheet):
             did.replace("ocd-division", "ocd-jurisdiction")
         )
 
-
         with open("%s.csv" % (placename), 'w') as fd:
             fields = list(jurisdiction_data[0].keys())
             writer = csv.DictWriter(fd, fields)
