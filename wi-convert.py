@@ -2,6 +2,7 @@ from collections import defaultdict
 import xlrd
 import sys
 import csv
+import re
 
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "data.settings")
@@ -37,18 +38,12 @@ def process_district(district):
 
 
 def normalize(person):
-    # {'WorkPhone': '', 'HomePhone': '',
-    #  'JurisdictionName': 'CITY OF KAUKAUNA - MAIN - 45241',
-    #  'CityStateZip': 'KAUKAUNA, WI  54130-3040',
-    #  'TermStartDate': 1.0,
-    #  'TermEndDate': 1.0}
-
     translate = {
         "LastName": "Last Name",
         "FirstName": "First Name",
         "MiddleName": "Middle Name",
 
-        "DistictName": "Role",   # Yes, it's typo'd.
+        "DistictName": "District",   # Yes, it's typo'd.
         "OfficePosition": "Position",
 
         "Email": "Email",
@@ -57,7 +52,10 @@ def normalize(person):
         "WorkPhone": "Phone (Work)",
     }
 
-    obj = {}
+
+    obj = {
+        "Name": "{} {}".format(person['FirstName'], person['LastName'])
+    }
 
     obj['Address'] = "%s, %s" % (
         person.pop("Address"),
@@ -143,6 +141,7 @@ def process_sheet(sheet):
         with open(fpath, 'w') as fd:
             fields = list(jurisdiction_data[0].keys())
             writer = csv.DictWriter(fd, fields)
+            writer.writeheader()
             for row in jurisdiction_data:
                 writer.writerow(row)
 
