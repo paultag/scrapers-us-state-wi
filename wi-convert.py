@@ -3,6 +3,13 @@ import xlrd
 import sys
 import csv
 
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "data.settings")
+
+from django.core.management import call_command
+import django
+django.setup()
+
 
 def load_mapping():
     with open("../jurisdictions.csv", 'r') as fd:
@@ -131,11 +138,19 @@ def process_sheet(sheet):
             did.replace("ocd-division", "ocd-jurisdiction")
         )
 
-        with open("%s.csv" % (placename), 'w') as fd:
+        fpath = "%s.csv" % (placename)
+
+        with open(fpath, 'w') as fd:
             fields = list(jurisdiction_data[0].keys())
             writer = csv.DictWriter(fd, fields)
             for row in jurisdiction_data:
                 writer.writerow(row)
+
+        print("Importing %s" % (jid))
+        call_command(
+            'import_sheet',
+            fpath, jid, "http://gab.wi.gov/", "paultag@sunlightfoundation.com"
+        )
 
 
 def convert(path):
