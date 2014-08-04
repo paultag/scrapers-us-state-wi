@@ -65,7 +65,7 @@ def normalize(person):
     for k, v in translate.items():
         obj[v] = person.pop(k)
 
-    dconv = lambda args: "%s-%s-%s" % args[:3] if args else None
+    dconv = lambda args: "%s-%s-%s" % args[:3] if args else "1000-01-01"
 
     obj['Start Date'] = dconv(person.pop("TermStartDate"))
     obj['End Date'] = dconv(person.pop("TermEndDate"))
