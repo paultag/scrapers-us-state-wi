@@ -148,7 +148,10 @@ def process_sheet(sheet):
         print("Importing %s" % (jid))
         call_command(
             'import_sheet',
-            fpath, jid, "http://gab.wi.gov/", "paultag@sunlightfoundation.com"
+            fpath, jid,
+            "http://gab.wi.gov/",
+            "paultag@sunlightfoundation.com",
+            "true",
         )
 
 
