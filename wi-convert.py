@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 import xlrd
 import sys
 import csv
@@ -153,7 +154,7 @@ def process_sheet(sheet):
         fpath = "%s.csv" % (placename)
 
         with open(fpath, 'w') as fd:
-            fields = list(jurisdiction_data[0].keys())
+            fields = set(chain(*[x.keys() for x in jurisdiction_data]))
             writer = csv.DictWriter(fd, fields)
             writer.writeheader()
             for row in jurisdiction_data:
