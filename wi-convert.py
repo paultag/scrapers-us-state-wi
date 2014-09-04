@@ -90,7 +90,8 @@ def process_sheet(sheet):
 
     rows = iter(rows)
     header = [x.value for x in next(rows)]
-    data = defaultdict(list)
+    data = defaultdict(dict)
+    counts = defaultdict(lambda: defaultdict(int))
 
     for row in rows:
         obj = dict(zip(header, [x.value for x in row]))
@@ -99,7 +100,20 @@ def process_sheet(sheet):
         obj['TermEndDate'] = parsedate(sheet, obj['TermEndDate'])
         obj['TermStartDate'] = parsedate(sheet, obj['TermStartDate'])
         jurisdiction, person = normalize(obj)
-        data[jurisdiction].append(person)
+        name = person['Name']
+        if name in data[jurisdiction]:
+            op = data[jurisdiction][name]
+            counts[jurisdiction][name] += 1
+            n = counts[jurisdiction][name]
+            position = op.pop("Position")
+            district = op.pop("District", None)
+            op.update(person)
+            op['Position ({})'.format(n)] = position
+            if district:
+                op['District ({})'.format(n)] = district
+            person = op
+        else:
+            data[jurisdiction][name] = person
 
     mappings = load_mapping()
     places = defaultdict(dict)
@@ -110,7 +124,7 @@ def process_sheet(sheet):
         ] = mapping['Division']
 
     for key in data.keys():
-        jurisdiction_data = data[key]
+        jurisdiction_data = list(data[key].values())
 
         jurisdiction = process_district(key)
         placename = jurisdiction['place']
