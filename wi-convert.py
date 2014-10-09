@@ -66,7 +66,7 @@ def normalize(person):
     for k, v in translate.items():
         obj[v] = person.pop(k)
 
-    dconv = lambda args: "%s-%s-%s" % args[:3] if args else "1000-01-01"
+    dconv = lambda args: "%s-%s-%s" % args[:3] if args else None
 
     obj['Start Date'] = dconv(person.pop("TermStartDate"))
     obj['End Date'] = dconv(person.pop("TermEndDate"))
@@ -100,6 +100,9 @@ def process_sheet(sheet):
         jurisdiction = process_district(obj.get('JurisdictionName'))
         obj['TermEndDate'] = parsedate(sheet, obj['TermEndDate'])
         obj['TermStartDate'] = parsedate(sheet, obj['TermStartDate'])
+        if obj['TermStartDate'] == "" or obj['TermEndDate'] == "":
+            continue
+
         jurisdiction, person = normalize(obj)
         name = person['Name']
         if name in data[jurisdiction]:
